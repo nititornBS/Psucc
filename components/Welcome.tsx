@@ -7,7 +7,6 @@ import { contractABI, contractAddress } from "./util/constants";
 function Welcome() {
   const [address, setaddress] = useState("");
   const [amount, setamount] = useState(0);
-
   const [wallet, setWallet] = useState("");
   const [signer, setSigner] = useState(undefined);
   async function execute() {
@@ -28,6 +27,20 @@ function Welcome() {
       console.log("Please install MetaMask");
     }
   }
+  async function mint() {
+    if (typeof window.ethereum !== "undefined") {
+      const ContractAddress = contractAddress;
+      const abi = contractABI;
+      const contract = new ethers.Contract(ContractAddress, abi, signer);
+      try {
+        await contract.minttoken(address, amount);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("Please install MetaMask");
+    }
+  }
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     setSigner(provider.getSigner());
@@ -38,6 +51,11 @@ function Welcome() {
   const handleSubmit = (e: any) => {
     execute();
     e.preventDefault();
+  };
+
+  const mintfs = () => {
+    mint();
+   
   };
 
   const getCurrentWalletConnected = async () => {
@@ -142,10 +160,18 @@ function Welcome() {
               type="submit"
               className=" w-20 border border-3 border-red-600"
             >
-              Submit
+              Submit tranfer 
             </button>
           )}
         </form>
+      </div>
+      <div className=" w-[50%] h-[20%]">
+        <button
+          onClick={mintfs}
+          className=" w-20 border border-3 border-red-600"
+        >
+          MINT
+        </button>
       </div>
     </div>
   );
