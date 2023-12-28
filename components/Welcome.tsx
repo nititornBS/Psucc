@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Signer } from "ethers";
 import { ethers } from "ethers";
 import { contractABI, contractAddress } from "./util/constants";
 
@@ -8,7 +8,7 @@ function Welcome() {
   const [address, setaddress] = useState("");
   const [amount, setamount] = useState(0);
   const [wallet, setWallet] = useState("");
-  const [signer, setSigner] = useState(undefined);
+  const [signer, setSigner] = useState<Signer | undefined>(() => undefined);
   async function execute() {
     if (typeof window.ethereum !== "undefined") {
       const ContractAddress = contractAddress;
@@ -41,12 +41,13 @@ function Welcome() {
       console.log("Please install MetaMask");
     }
   }
-  useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    setSigner(provider.getSigner());
-    getCurrentWalletConnected();
-    addWalletListener();
-  }, [wallet]);
+ useEffect(() => {
+   const provider = new ethers.providers.Web3Provider(window.ethereum);
+   const user = provider.getSigner() as Signer;
+   setSigner(() => user);
+   getCurrentWalletConnected();
+   addWalletListener();
+ }, [wallet]);
 
   const handleSubmit = (e: any) => {
     execute();
@@ -55,7 +56,6 @@ function Welcome() {
 
   const mintfs = () => {
     mint();
-   
   };
 
   const getCurrentWalletConnected = async () => {
@@ -70,7 +70,7 @@ function Welcome() {
         } else {
           console.log("Connect to MetaMask using the Connect button");
         }
-      } catch (err) {
+      } catch (err:any) {
         console.error(err.message);
       }
     } else {
@@ -81,7 +81,7 @@ function Welcome() {
 
   const addWalletListener = async () => {
     if (typeof window != "undefined" && typeof window.ethereum != "undefined") {
-      window.ethereum.on("accountsChanged", (accounts) => {
+      window.ethereum.on("accountsChanged", (accounts:any) => {
         setWallet(accounts[0]);
         console.log(accounts[0]);
       });
@@ -101,7 +101,7 @@ function Welcome() {
         });
         setWallet(accounts[0]);
         console.log(accounts[0]);
-      } catch (err) {
+      } catch (err:any) {
         console.error(err.message);
       }
     } else {
@@ -149,7 +149,7 @@ function Welcome() {
               type="number"
               className=" border border-3 border-black"
               value={amount}
-              onChange={(e) => setamount(e.target.value)}
+              onChange={(e:any) => setamount(e.target.value)}
             />
           </label>
 
@@ -160,7 +160,7 @@ function Welcome() {
               type="submit"
               className=" w-20 border border-3 border-red-600"
             >
-              Submit tranfer 
+              Submit tranfer
             </button>
           )}
         </form>
